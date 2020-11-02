@@ -6,78 +6,66 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import make_pipeline, Pipeline
+from transform import dataclean as dc
+from transform import dropNAN as dn
 
 import joblib
 
 DIR_NAME = path.dirname(__file__)
 
+def load_label():
+    y = pd.read_csv('dataset/user-status-after-test.csv', sep=',')
+    
+    return y
+
 def load_data():
     df_features = pd.read_csv('dataset/weekly-infos-before-test.csv', sep=',')
     df_labels = pd.read_csv('dataset/user-status-after-test.csv', sep=',')
 
-    df_completo = pd.concat([df_features,df_labels],axis=1)
-    #print(df_completo)
-    #print(df_completo.isnull().sum())
-
-    print("total: ",df_features.loc[df_features.user == df_labels[:,0]].count())
-
-    print(len(df_features))
-    print(len(df_labels))
-    #print(len(df_features))
-    df_features.dropna(inplace=True)
-   # print(len(df_features))
-    #df_features.fillna('a',inplace=True)
-   # print(df_features.isnull().sum())
+    print(df_features.isnull().sum())
     
-    X = df_features.iloc[:,1:45].values
-    y = df_labels.iloc[:,1].values
+    df_labels.loc[df_labels.status == 'assinante'] = 0
+    df_labels.loc[df_labels.status == 'cancelou'] = 1
+
+    label = df_labels.iloc[:,1].values
+    y=label.astype('int')
     
-    print("----------------Labels--------------------")
-    print(y)
-    print("------------------------------------------")
-    print()
-    print("----------------Features--------------------")
-    print(X)
-    print("------------------------------------------")
+    #print(y)
+    return df_features, y
 
-    return X, y
+    
 
-def transform(X):
-
-    tf = StandardScaler().fit(X)
-
+def transform2(X):
+    cl= dc()
+    dclean = cl.fit_transform(X)
+    print('dclean: ', dclean)
+    #tf = StandardScaler().fit_transform(X)
+    cl2 = dn()
+    dropn = cl2.fit_transform(dclean)
+    #print('dropn: ', dropn)
     pipe = Pipeline(
         [
-            ('standard_scaler', tf)
-            
+            ('dataclean',dc()),
+            ('DropNAN',dn())
         ]
     )
-    #return tf
+    print("passou aqui")
     return pipe
 
 def train(args):
     X,y = load_data()
     le = LabelEncoder()
-
-    #print(X.isnull().sum())
-
-    #print(X[1,40])
-    
-    X[:,7] = le.fit_transform(X[:,7])
-    X[:,9] = le.fit_transform(X[:,9])
-    X[:,10] = le.fit_transform(X[:,10])
-    X[:,40] = le.fit_transform(X[:,40])
-
-    print(X[1,:])
     # transformation
-    tf = transform(X)
+    tf = transform2(X)
 
+    print("-------------------------------------------- passou")
+    print(tf)
+    print("-------------------------------------------- passou")
     clf = MLPClassifier(max_iter=2000)
-
-    X_tf = tf.transform(X)
+    X_tf = tf.fit_transform(X)
     clf.fit(X_tf,y)
-    print(X_tf.shape)
-    clf.predict(X)
+    #print(X_tf.shape)
+    clf.predict(X_tf)
 
     #save
     dump_folder=path.join(args['output_folder'],args['experiment_name'])
@@ -87,7 +75,7 @@ def train(args):
 
     # dump model
     filename = 'model_mlp_{}_v0.1.pkl'.format(args['model_name_tag'])
-    #joblib.dump(clf,filename=dump_folder+'/classifier')
+    joblib.dump(clf,filename=dump_folder+'/classifier')
     joblib.dump(clf,filename=path.join(dump_folder,filename))
 
     # dump normalization
@@ -95,7 +83,7 @@ def train(args):
     joblib.dump(tf,filename=path.join(dump_folder,filename))
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Iris classifier training 0.0.1')
+    parser = argparse.ArgumentParser(description='Globoplay classifier training 0.0.1')
     parser.add_argument('--experiment_name', required=True, type=str)
     parser.add_argument('--output_folder', default=path.join(DIR_NAME, 'models'), type=str)
     parser.add_argument('--model_name_tag', required=True, type=str)

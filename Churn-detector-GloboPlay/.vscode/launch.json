@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
 
             "args": ["--experiment_name","exp_01_default","--model_name_tag","default"]
-
+    
         }
     ]
 }

@@ -14,14 +14,22 @@ class Item(BaseModel):
 
 app = FastAPI()
 
-# load vars
 model, tf = load_models()
 
 @app.post("/predict/")
 def predict(item: Item):
+    print(item.features)
+    #print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ", len(item.features))
     x = check_inputs(item.features)
-    y_hat = model.predict(tf.transform(x))
-    item.label = list(y_hat)
+    x_tf = tf.transform(x)
+    print("passou do transform")
+    y_hat = model.predict(x_tf)
+    print("y_hat", y_hat[0])
+    if(y_hat[0] == 0):
+        pred = "Assinante"
+    else:
+        pred = "Cancelou"
+    item.label = pred
 
     return item
 
