@@ -32,9 +32,9 @@ def predict(features: features_iris):
     #features_dict = features_iris.dict()
     # Check inputs
     x = check_inputs(f)
-    #tfm = tf.transform(x)
+    tfm = tf.transform(x)
     print(tfm)
-    y_hat = model.predict(x)
+    y_hat = model.predict(tfm)
 
     yhat = str(y_hat)[1:-1]
     json_yhat = {"y_hat":yhat}
