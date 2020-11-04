@@ -21,4 +21,6 @@ Quando o modelo é carregado fora das endpoints, o modelo se torna acessível po
   - Passo 3: Utilizar o endereço localhost:8000/predict/ e mandar os parâmetros ou utilizar o postman e usar a colletion do FastAPI que se encontra na pasta  Collections_postman/lapisco_fastAPI_iris.postman_collection.json
   
 ## Questão 6
-  > Obs: Encontra-se em desenvolvimento.
+  - Passo 1: Acessar a pasta Churn-detector-GloboPlay
+  - Passo 2: Utilizar o comando 'docker-compose up --build'. Caso necessite de autorização utilize o 'sudo docker-compose up --build'
+  - Passo 3: Utilizar o endereço localhost:8000/predict/ e mandar os parâmetros ou utilizar o postman e usar a colletion do Churn detector que se encontra na pasta  Collections_postman/lapisco_FastAPI_GloboPlay.postman_collection.json
